@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="banner">
+                <div class="banner-text">
+                    <h1>ToDo</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    {% if user.is_authenticated %}
+    <div class="row">
+        <!-- Task Creation Form -->
+        <div class="col-md-6">
+            <form method="POST" class="p-10 shadow">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="text" class="form-control" name="task" placeholder="Task Name"><br>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="description" placeholder="Description"><br>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" name="priority">
+                        <option value="">Select Priority</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select><br>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" name="status">
+                        <option value="">Select status</option>
+                        <option value="Completed">Completed</option>
+                        <option value="In progress">In Progress</option>
+                        <option value="Pending">Pending</option>
+                    </select><br>
+                </div>
+                <div class="form-group">
+                    <input type="date" class="form-control" name="date" placeholder="Enter your date">
+                </div>
+                <input type="submit" class="btn btn-success" value="Add Task">
+            </form>
+        </div>
+
+        <!-- Task List with Priority Filters -->
+        <div class="col-md-6">
+            <h4>Tasks To Be Completed</h4>
+
+            <!-- Priority Filter Buttons -->
+            <div class="mb-3">
+                <button class="btn btn-danger" onclick="filterTasks('High')">High</button>
+                <button class="btn btn-warning" onclick="filterTasks('Medium')">Medium</button>
+                <button class="btn btn-success" onclick="filterTasks('Low')">Low</button>
+                <button class="btn btn-secondary" onclick="filterTasks('All')">All</button>
+            </div>
+
+            <!-- Task Cards -->
+            {% for i in task1 %}
+
+            <div class="shadow card task-card" data-priority="{{ i.priority }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ i.name }}</h5>
+                    <p><strong>Description:</strong> {{ i.description }}</p>
+                    <p><strong>Priority:</strong> {{ i.priority }}</p>
+                    <p><strong>Status:</strong> {{ i.status }}</p>
+                    <p><strong>Date:</strong> {{ i.date }}</p>
+                    <a class="btn btn-danger" href="{% url 'delete' i.id %}">Done</a>
+                    <a class="btn btn-primary" href="{% url 'update' i.id %}">Update</a>
+
+                </div>
+            </div>
+            <br>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <p>Please <a href="">log in</a> to manage your tasks.</p>
+    {% endif %}
+</div>
+</div>
+
+<!-- JavaScript for Filtering Tasks -->
+<script>
+    function filterTasks(priority) {
+        const tasks = document.querySelectorAll('.task-card');
+        tasks.forEach(task => {
+            if (priority === 'All' || task.getAttribute('data-priority') === priority) {
+                task.style.display = 'block';
+            } else {
+                task.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}
